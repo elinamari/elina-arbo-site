@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elina Arbo</title>
+<style>
+  :root{
+    --pink-top:#c81d78;
+    --pink-mid:#e64fa0;
+    --pink-bottom:#f9c3e3;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{
+    margin:0; padding:0; height:100%;
+    font-family:-apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    overflow:hidden;
+    user-select:none;
+  }
+  #desktop{
+    position:relative;
+    width:100%; height:100vh; height:100dvh;
+    background:linear-gradient(180deg, var(--pink-top) 0%, var(--pink-mid) 45%, var(--pink-bottom) 100%);
+    overflow:hidden;
+  }
+
+  /* top bar */
+  #topbar{
+    position:absolute; top:0; left:0; right:0;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 22px;
+    color:#fff;
+    font-weight:700;
+    font-size:clamp(14px, 2.2vw, 17px);
+    letter-spacing:0.2px;
+    pointer-events:none;
+    z-index:5;
+  }
+  #topbar a{ pointer-events:auto; color:#fff; }
+  #topbar .right{ display:flex; align-items:center; gap:14px; font-variant-numeric:tabular-nums; font-weight:600; }
+  #topbar .right a{ display:flex; }
+
+  /* icons */
+  .icon{
+    position:absolute;
+    display:flex; flex-direction:column; align-items:center;
+    cursor:grab;
+    touch-action:none;
+    z-index:2;
+  }
+  .icon:active{ cursor:grabbing; }
+  .icon .thumb{
+    display:flex; align-items:center; justify-content:center;
+    filter:drop-shadow(0 6px 10px rgba(0,0,0,0.28));
+  }
+  .icon .thumb img{
+    display:block;
+    width:100%;
+    height:auto;
+    object-fit:contain;
+    pointer-events:none;
+  }
+  .icon .label{
+    margin-top:8px;
+    color:#fff;
+    font-size:13px;
+    font-weight:700;
+    text-align:center;
+    text-shadow:0 1px 3px rgba(0,0,0,0.25);
+    line-height:1.25;
+    max-width:130px;
+  }
+  .icon.dragging{ z-index:50; }
+
+  /* windows */
+  .win{
+    position:absolute;
+    min-width:260px;
+    width:min(480px, 88vw);
+    background:#f4f4f4;
+    border-radius:9px;
+    box-shadow:0 25px 60px rgba(0,0,0,0.45);
+    overflow:hidden;
+    z-index:100;
+    display:none;
+  }
+  .win.open{ display:block; }
+  .win .titlebar{
+    height:34px;
+    background:linear-gradient(180deg,#ececec,#dcdcdc);
+    border-bottom:1px solid #c8c8c8;
+    display:flex; align-items:center;
+    padding:0 12px;
+    gap:8px;
+    cursor:grab;
+    touch-action:none;
+  }
+  .win .titlebar:active{ cursor:grabbing; }
+  .win .tl-dot{ width:12px; height:12px; border-radius:50%; flex:none; }
+  .win .tl-dot.close-btn{ cursor:pointer; }
+  .win .wtitle{
+    flex:1; text-align:center; font-size:12.5px; font-weight:700; color:#444;
+    margin-right:44px;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .win .content{
+    padding:20px 22px 22px;
+    max-height:min(70vh, 70dvh);
+    overflow:auto;
+    font-size:14.5px;
+    color:#222;
+    line-height:1.55;
+  }
+  .win .content h2{ margin:0 0 10px; font-size:19px; }
+  .win .content p{ margin:0 0 12px; }
+  .win .content img.preview{
+    width:100%; border-radius:8px; display:block; margin-bottom:10px;
+  }
+  .win .content a.btn{
+    display:inline-block;
+    margin-top:6px;
+    background:var(--pink-top);
+    color:#fff;
+    text-decoration:none;
+    font-weight:700;
+    font-size:13px;
+    padding:9px 16px;
+    border-radius:20px;
+  }
+  .win .content .placeholder-note{
+    margin-top:14px;
+    padding:10px 12px;
+    background:#fff6e8;
+    border:1px solid #f0dca8;
+    border-radius:8px;
+    font-size:12.5px;
+    color:#7a5c1e;
+  }
+  .win .content ul{ padding-left:18px; margin:0 0 12px; }
+  .win .content li{ margin-bottom:6px; }
+
+  #overlay{
+    position:absolute; inset:0; background:rgba(0,0,0,0.15);
+    display:none; z-index:90;
+  }
+  #overlay.show{ display:block; }
+
+  @media (max-width:600px){
+    .icon .label{ font-size:11.5px; max-width:100px; }
+    #topbar{ padding:14px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="desktop">
+  <div id="overlay"></div>
+  <div id="topbar">
+    <div>Elina Arbo</div>
+    <div class="right">
+      <a href="#" id="ig-link" target="_blank" rel="noopener" title="Instagram">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="5"/>
+          <circle cx="12" cy="12" r="4"/>
+          <circle cx="17.2" cy="6.8" r="1" fill="#fff" stroke="none"/>
+        </svg>
+      </a>
+      <span id="clock">--:--:--</span>
+    </div>
+  </div>
+
+  <!-- icons are injected here by JS from the ICONS list below -->
+
+  <!-- WINDOWS -->
+  <div class="win" id="win-flyer">
+    <div class="titlebar">
+      <span class="tl-dot close-btn" style="background:#ff5f57"></span><span class="tl-dot" style="background:#febc2e"></span><span class="tl-dot" style="background:#28c840"></span>
+      <div class="wtitle">Diasporic Techno Night.jpg</div>
+    </div>
+    <div class="content">
+      <img class="preview" src="icons/flyer.png" alt="">
+      <p>Aramaic B2B (Elina Arbo and Chata) · Mira Mira · Tiny T-Bone · Kyruh</p>
+      <p>Doors 10:30 · 233 Butler St, Brooklyn</p>
+      <a class="btn" href="#" target="_blank" rel="noopener">Get Tickets ↗</a>
+    </div>
+  </div>
+
+  <div class="win" id="win-about">
+    <div class="titlebar">
+      <span class="tl-dot close-btn" style="background:#ff5f57"></span><span class="tl-dot" style="background:#febc2e"></span><span class="tl-dot" style="background:#28c840"></span>
+      <div class="wtitle">About.txt</div>
+    </div>
+    <div class="content">
+      <p>Hello!</p>
+      <p>My name is Elina Arbo and I am an artist that works with sound-based mediums and the written form.</p>
+      <p>I am a DJ, primarily mixing electronic music. I also incorporate samples from the Assyrian folk tradition in my productions. Currently, I'm a Tanfis II Resident at Remix Culture, and I'll be touring across California this fall.</p>
+      <p>In addition to music, I enjoy writing poetry. I was a 2024 Mentee Fellow at the International Armenian Literary Alliance this past summer.</p>
+      <p>Send me an email &amp; I'll say hi back. 🍉</p>
+    </div>
+  </div>
+
+  <div class="win" id="win-photo">
+    <div class="titlebar">
+      <span class="tl-dot close-btn" style="background:#ff5f57"></span><span class="tl-dot" style="background:#febc2e"></span><span class="tl-dot" style="background:#28c840"></span>
+      <div class="wtitle">Photobooth.jpeg</div>
+    </div>
+    <div class="content">
+      <img class="preview" src="icons/photobooth.png" alt="">
+      <div class="placeholder-note">This preview and the icon both pull from icons/photobooth.png — replace that one file and both update.</div>
+    </div>
+  </div>
+
+  <div class="win" id="win-pdf">
+    <div class="titlebar">
+      <span class="tl-dot close-btn" style="background:#ff5f57"></span><span class="tl-dot" style="background:#febc2e"></span><span class="tl-dot" style="background:#28c840"></span>
+      <div class="wtitle">April.pdf</div>
+    </div>
+    <div class="content">
+      <p>This would open your actual PDF (a flyer, zine, or press one-sheet, for example) in a new tab.</p>
+      <a class="btn" href="#" target="_blank" rel="noopener">Open PDF ↗</a>
+    </div>
+  </div>
+
+  <div class="win" id="win-tour">
+    <div class="titlebar">
+      <span class="tl-dot close-btn" style="background:#ff5f57"></span><span class="tl-dot" style="background:#febc2e"></span><span class="tl-dot" style="background:#28c840"></span>
+      <div class="wtitle">2024 Tour &amp; Tickets</div>
+    </div>
+    <div class="content">
+      <h2>Tour Dates</h2>
+      <ul>
+        <li>Sept 12 — Los Angeles, CA</li>
+        <li>Sept 20 — San Francisco, CA</li>
+        <li>Oct 4 — San Diego, CA</li>
+      </ul>
+      <a class="btn" href="#" target="_blank" rel="noopener">All Tickets ↗</a>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ======================================================================
+   ICON CONFIG — this is the only part you need to touch for new content.
+
+   To SWAP an existing icon's picture:
+     Just replace the PNG/JPEG file in the /icons folder, keeping the
+     same filename. Nothing else needs to change.
+
+   To RESIZE an icon:
+     Change its "width" number (in pixels). Height scales automatically.
+
+   To MOVE an icon's default position:
+     Change "x" and "y" (percent from left / top of the screen).
+     People can still drag it anywhere afterward — this is just the
+     starting spot.
+
+   To ADD a brand new icon:
+     1. Add your image file to the /icons folder, e.g. icons/new-mix.jpg
+     2. Copy one of the blocks below, paste it, and edit the fields.
+     3. Set "action" to either:
+          { type: "window", target: "win-something" }   -> opens a popup
+          { type: "link",   target: "https://..." }      -> opens a URL
+     4. If you used type:"window", also add a matching
+          <div class="win" id="win-something">...</div>
+        block up in the HTML above (copy one of the existing ones).
+
+   To DELETE an icon: just delete or comment out its block.
+   ====================================================================== */
+
+  const ICONS = [
+    {
+      id: "flyer",
+      label: "Diasporic Techno Night",
+      image: "icons/flyer.png",
+      width: 96,
+      x: 6, y: 16,
+      action: { type: "window", target: "win-flyer" }
+    },
+    {
+      id: "about",
+      label: "About.txt",
+      image: "icons/about.png",
+      width: 88,
+      x: 38, y: 9,
+      action: { type: "window", target: "win-about" }
+    },
+    {
+      id: "mixes",
+      label: "Mixes.mp3",
+      image: "icons/mixes.png",
+      width: 82,
+      x: 75, y: 10,
+      action: { type: "link", target: "https://soundcloud.com/" } // TODO: your real link
+    },
+    {
+      id: "photobooth",
+      label: "Photobooth.jpeg",
+      image: "icons/photobooth.png",
+      width: 100,
+      x: 56, y: 38,
+      action: { type: "window", target: "win-photo" }
+    },
+    {
+      id: "pdf",
+      label: "April.pdf",
+      image: "icons/pdf.png",
+      width: 74,
+      x: 7, y: 52,
+      action: { type: "window", target: "win-pdf" }
+    },
+    {
+      id: "tour",
+      label: "2024 Tour & Tickets",
+      image: "icons/folder.png",
+      width: 100,
+      x: 29, y: 57,
+      action: { type: "window", target: "win-tour" }
+    },
+    {
+      id: "email",
+      label: "Email.me",
+      image: "icons/mail.png",
+      width: 78,
+      x: 85, y: 66,
+      action: { type: "link", target: "mailto:you@example.com" } // TODO: your real email
+    }
+  ];
+
+  // Your Instagram link (top right icon)
+  const INSTAGRAM_URL = "https://instagram.com/"; // TODO: your handle
+
+  /* ===================== everything below just runs the page ===================== */
+
+  const desktop = document.getElementById('desktop');
+  const overlay = document.getElementById('overlay');
+  document.getElementById('ig-link').href = INSTAGRAM_URL;
+
+  // live clock
+  function tick(){
+    const d = new Date();
+    const h = String(d.getHours()).padStart(2,'0');
+    const m = String(d.getMinutes()).padStart(2,'0');
+    const s = String(d.getSeconds()).padStart(2,'0');
+    document.getElementById('clock').textContent = h+':'+m+':'+s;
+  }
+  tick(); setInterval(tick, 1000);
+
+  function bringToFront(el){
+    document.querySelectorAll('.win.open').forEach(w=>w.style.zIndex=100);
+    el.style.zIndex = 200;
+  }
+  function openWindow(id){
+    const w = document.getElementById(id);
+    if(!w) return;
+    document.querySelectorAll('.win.open').forEach(o=>o.classList.remove('open'));
+    w.classList.add('open');
+    overlay.classList.add('show');
+    bringToFront(w);
+  }
+  function closeAllWindows(){
+    document.querySelectorAll('.win.open').forEach(o=>o.classList.remove('open'));
+    overlay.classList.remove('show');
+  }
+  overlay.addEventListener('click', closeAllWindows);
+  document.querySelectorAll('.win .close-btn').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{ e.stopPropagation(); closeAllWindows(); });
+  });
+
+  // generic draggable — works for icons and window titlebars
+  function makeDraggable(handle, moveTarget, opts){
+    opts = opts || {};
+    let startX, startY, startLeft, startTop, dragging=false, moved=false;
+
+    handle.addEventListener('pointerdown', (e)=>{
+      e.preventDefault();
+      const rect = moveTarget.getBoundingClientRect();
+      const parentRect = desktop.getBoundingClientRect();
+      startX = e.clientX; startY = e.clientY;
+      startLeft = rect.left - parentRect.left;
+      startTop = rect.top - parentRect.top;
+      dragging = true; moved = false;
+      handle.setPointerCapture(e.pointerId);
+      if(opts.onStart) opts.onStart();
+    });
+    handle.addEventListener('pointermove', (e)=>{
+      if(!dragging) return;
+      const dx = e.clientX - startX, dy = e.clientY - startY;
+      if(Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true;
+      const parentRect = desktop.getBoundingClientRect();
+      let newLeft = startLeft + dx, newTop = startTop + dy;
+      newLeft = Math.max(4, Math.min(newLeft, parentRect.width - moveTarget.offsetWidth - 4));
+      newTop = Math.max(4, Math.min(newTop, parentRect.height - moveTarget.offsetHeight - 4));
+      moveTarget.style.left = newLeft + 'px';
+      moveTarget.style.top = newTop + 'px';
+      moveTarget.style.right = 'auto';
+    });
+    handle.addEventListener('pointerup', ()=>{
+      dragging = false;
+      if(opts.onEnd) opts.onEnd(moved);
+    });
+  }
+
+  // build icons from ICONS config
+  ICONS.forEach(cfg=>{
+    const el = document.createElement('div');
+    el.className = 'icon';
+    el.style.left = cfg.x + '%';
+    el.style.top = cfg.y + '%';
+    // responsive width: never exceeds a share of the viewport
+    el.style.width = 'min(' + cfg.width + 'px, ' + (cfg.width/1100*100).toFixed(1) + 'vw + 40px)';
+
+    const thumb = document.createElement('div');
+    thumb.className = 'thumb';
+    thumb.style.width = '100%';
+
+    const img = document.createElement('img');
+    img.src = cfg.image;
+    img.alt = cfg.label;
+    img.onerror = function(){
+      // graceful fallback if an image file is missing/renamed
+      thumb.innerHTML = '';
+      thumb.style.background = 'rgba(255,255,255,0.85)';
+      thumb.style.borderRadius = '10px';
+      thumb.style.aspectRatio = '1/1';
+      thumb.style.display = 'flex';
+      thumb.style.alignItems = 'center';
+      thumb.style.justifyContent = 'center';
+      thumb.style.fontSize = '11px';
+      thumb.style.color = '#888';
+      thumb.style.textAlign = 'center';
+      thumb.style.padding = '6px';
+      thumb.textContent = 'missing image: ' + cfg.image;
+    };
+    thumb.appendChild(img);
+
+    const label = document.createElement('div');
+    label.className = 'label';
+    label.textContent = cfg.label;
+
+    el.appendChild(thumb);
+    el.appendChild(label);
+    desktop.appendChild(el);
+
+    makeDraggable(el, el, {
+      onStart: ()=> el.classList.add('dragging'),
+      onEnd: (moved)=>{
+        el.classList.remove('dragging');
+        if(!moved){
+          if(cfg.action.type === 'window') openWindow(cfg.action.target);
+          if(cfg.action.type === 'link') window.open(cfg.action.target, '_blank');
+        }
+      }
+    });
+  });
+
+  // window titlebars
+  document.querySelectorAll('.win').forEach(win=>{
+    const bar = win.querySelector('.titlebar');
+    makeDraggable(bar, win, { onStart: ()=> bringToFront(win) });
+    // give each window a sensible default open position, roughly centered-ish
+    win.style.left = '20%';
+    win.style.top = '18%';
+  });
+</script>
+
+</body>
+</html>
