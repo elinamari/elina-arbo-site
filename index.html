@@ -172,19 +172,6 @@
   <!-- icons are injected here by JS from the ICONS list below -->
 
   <!-- WINDOWS -->
-  <div class="win" id="win-flyer">
-    <div class="titlebar">
-      <span class="tl-dot close-btn" style="background:#ff5f57"></span><span class="tl-dot" style="background:#febc2e"></span><span class="tl-dot" style="background:#28c840"></span>
-      <div class="wtitle">Diasporic Techno Night.jpg</div>
-    </div>
-    <div class="content">
-      <img class="preview" src="icons/flyer.png" alt="">
-      <p>Aramaic B2B (Elina Arbo and Chata) · Mira Mira · Tiny T-Bone · Kyruh</p>
-      <p>Doors 10:30 · 233 Butler St, Brooklyn</p>
-      <a class="btn" href="#" target="_blank" rel="noopener">Get Tickets ↗</a>
-    </div>
-  </div>
-
   <div class="win" id="win-about">
     <div class="titlebar">
       <span class="tl-dot close-btn" style="background:#ff5f57"></span><span class="tl-dot" style="background:#febc2e"></span><span class="tl-dot" style="background:#28c840"></span>
@@ -201,43 +188,24 @@
   <div class="win" id="win-photo">
     <div class="titlebar">
       <span class="tl-dot close-btn" style="background:#ff5f57"></span><span class="tl-dot" style="background:#febc2e"></span><span class="tl-dot" style="background:#28c840"></span>
-      <div class="wtitle">Photobooth.jpeg</div>
+      <div class="wtitle">photobooth.jpeg</div>
     </div>
     <div class="content">
-      <img class="preview" src="icons/photobooth.png" alt="">
-      <div class="placeholder-note">This preview and the icon both pull from icons/photobooth.png — replace that one file and both update.</div>
+      <img class="preview" src="icons/photo-booth.png" alt="">
+          <img class="preview" src="icons/photo-booth.png" alt="">
     </div>
   </div>
 
-  <div class="win" id="win-pdf">
+  <div class="win" id="win-moodring">
     <div class="titlebar">
       <span class="tl-dot close-btn" style="background:#ff5f57"></span><span class="tl-dot" style="background:#febc2e"></span><span class="tl-dot" style="background:#28c840"></span>
-      <div class="wtitle">April.pdf</div>
+      <div class="wtitle">moodring.pdf</div>
     </div>
     <div class="content">
       <p>This would open your actual PDF (a flyer, zine, or press one-sheet, for example) in a new tab.</p>
       <a class="btn" href="#" target="_blank" rel="noopener">Open PDF ↗</a>
     </div>
   </div>
-
-  <div class="win" id="win-tour">
-    <div class="titlebar">
-      <span class="tl-dot close-btn" style="background:#ff5f57"></span><span class="tl-dot" style="background:#febc2e"></span><span class="tl-dot" style="background:#28c840"></span>
-      <div class="wtitle">2024 Tour &amp; Tickets</div>
-    </div>
-    <div class="content">
-      <h2>Tour Dates</h2>
-      <ul>
-        <li>Sept 12 — Los Angeles, CA</li>
-        <li>Sept 20 — San Francisco, CA</li>
-        <li>Oct 4 — San Diego, CA</li>
-      </ul>
-      <a class="btn" href="#" target="_blank" rel="noopener">All Tickets ↗</a>
-    </div>
-  </div>
-</div>
-
-<script>
 /* ======================================================================
    ICON CONFIG — this is the only part you need to touch for new content.
 
@@ -273,11 +241,11 @@
       image: "icons/about-icon.png",
       width: 96,
       x: 6, y: 16,
-      action: { type: "window", target: "win-flyer" }
+      action: { type: "window", target: "win-about" }
     },
     {
       id: "mixes",
-      label: "Mixes.mp3",
+      label: "mixes.mp3",
       image: "icons/mp3-icon.png",
       width: 82,
       x: 75, y: 10,
@@ -292,12 +260,12 @@
       action: { type: "window", target: "win-photo" }
     },
     {
-      id: "upcoming",
+      id: "moodring.pdf",
       label: "moodring.pdf",
       image: "icons/moodring.png",
       width: 100,
       x: 29, y: 57,
-      action: { type: "window", target: "win-tour" }
+      action: { type: "window", target: "win-moodring" }
     },
     {
       id: "email",
