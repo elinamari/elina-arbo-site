@@ -135,10 +135,9 @@
   }
 
 .icon,.icon img,.icon .thumb{-webkit-user-drag:none;user-drag:none;}
-.win{opacity:0;transform:translateY(4px) scale(.985);transition:opacity .16s ease,transform .16s ease;}
-.win.open{opacity:1;transform:none;}
+.win{opacity:0;transform:translateY(4px) scale(.995);transition:opacity .15s ease,transform .15s ease;}
+.win.open{display:block;opacity:1;transform:none;}
 .win.dragging{transition:none;}
-#overlay{background:rgba(0,0,0,0.08);}
 
 </style>
 </head>
@@ -167,20 +166,11 @@
       <div class="wtitle" id="image-viewer-title">Image</div>
     </div>
     <div class="content">
-      <img id="image-viewer-img" src="" alt="">
+      <iframe id="image-viewer-frame" style="width:100%;height:70vh;border:none;"></iframe>
     </div>
   </div>
 
-  <!-- kept for icons that still use a popup window (bossanova) -->
-  <div class="win" id="win-image-viewer">
-    <div class="titlebar">
-      <span class="tl-dot close-btn" style="background:#ff5f57"></span><span class="tl-dot" style="background:#febc2e"></span><span class="tl-dot" style="background:#28c840"></span>
-      <div class="wtitle" id="image-viewer-title">Image</div>
-    </div>
-    <div class="content">
-      <img id="image-viewer-img" src="" alt="">
-    </div>
-  </div>
+  
 
 </div>
 
@@ -212,18 +202,20 @@
     },
     {
       id: "moodring",
-      label: "moodring.pdf",
+      label: "moodring.png",
       image: "icons/moodring.png",
+      file: "pdfs/moodring.pdf",
       width: 100,
-      x: 24, y: 57,
+      x: 29, y: 57,
       action: { type: "image" }
     },
     {
       id: "bossanova",
-      label: "bossanova.pdf",
+      label: "bossanova.png",
       image: "icons/bossanova.png",
+      file: "pdfs/bossanova.pdf",
       width: 100,
-      x: 42, y: 57,
+      x: 29, y: 57,
       action: { type: "image" }
     },
     {
@@ -232,7 +224,7 @@
       image: "icons/email-icon.png",
       width: 78,
       x: 85, y: 66,
-      action: { type: "link", target: "mailto:elina.arbo@gmail.com" }
+      action: { type: "link", target: "mailto:you@example.com" }
     }
   ];
 
@@ -264,7 +256,7 @@
     bringToFront(w);
   }
   function openImageViewer(cfg){
-    document.getElementById('image-viewer-img').src = cfg.expandImage || cfg.image;
+    document.getElementById('image-viewer-frame').src = cfg.file || cfg.expandImage || cfg.image;
     document.getElementById('image-viewer-title').textContent = cfg.label;
     openWindow('win-image-viewer');
   }
@@ -358,7 +350,7 @@
 
     const img = document.createElement('img');
     img.src = cfg.image;
-    img.alt = cfg.label;\n    img.draggable = false;
+    img.alt = cfg.label;
     img.onerror = function(){
       thumb.innerHTML = '';
       thumb.style.background = 'rgba(255,255,255,0.85)';
