@@ -24,7 +24,6 @@
     overflow:hidden;
   }
 
-  /* top bar */
   #topbar{
     position:absolute; top:0; left:0; right:0;
     display:flex; align-items:center; justify-content:space-between;
@@ -40,7 +39,6 @@
   #topbar .right{ display:flex; align-items:center; gap:14px; font-variant-numeric:tabular-nums; font-weight:600; }
   #topbar .right a{ display:flex; }
 
-  /* icons */
   .icon{
     position:absolute;
     display:flex; flex-direction:column; align-items:center;
@@ -72,7 +70,6 @@
   }
   .icon.dragging{ z-index:50; }
 
-  /* windows */
   .win{
     position:absolute;
     min-width:260px;
@@ -127,17 +124,11 @@
     padding:9px 16px;
     border-radius:20px;
   }
-  .win .content .placeholder-note{
-    margin-top:14px;
-    padding:10px 12px;
-    background:#fff6e8;
-    border:1px solid #f0dca8;
-    border-radius:8px;
-    font-size:12.5px;
-    color:#7a5c1e;
-  }
   .win .content ul{ padding-left:18px; margin:0 0 12px; }
   .win .content li{ margin-bottom:6px; }
+
+  #win-image-viewer .content{ padding:0; }
+  #win-image-viewer img{ width:100%; display:block; }
 
   #overlay{
     position:absolute; inset:0; background:rgba(0,0,0,0.15);
@@ -169,111 +160,42 @@
     </div>
   </div>
 
-  <!-- icons are injected here by JS from the ICONS list below -->
-
   <!-- WINDOWS -->
-  <div class="win" id="win-flyer">
+
+  <div class="win" id="win-image-viewer">
     <div class="titlebar">
       <span class="tl-dot close-btn" style="background:#ff5f57"></span><span class="tl-dot" style="background:#febc2e"></span><span class="tl-dot" style="background:#28c840"></span>
-      <div class="wtitle">Diasporic Techno Night.jpg</div>
+      <div class="wtitle" id="image-viewer-title">Image</div>
     </div>
     <div class="content">
-      <img class="preview" src="icons/flyer.png" alt="">
-      <p>Aramaic B2B (Elina Arbo and Chata) · Mira Mira · Tiny T-Bone · Kyruh</p>
-      <p>Doors 10:30 · 233 Butler St, Brooklyn</p>
-      <a class="btn" href="#" target="_blank" rel="noopener">Get Tickets ↗</a>
+      <img id="image-viewer-img" src="" alt="">
     </div>
   </div>
 
   <div class="win" id="win-about">
     <div class="titlebar">
       <span class="tl-dot close-btn" style="background:#ff5f57"></span><span class="tl-dot" style="background:#febc2e"></span><span class="tl-dot" style="background:#28c840"></span>
-      <div class="wtitle">About.txt</div>
+      <div class="wtitle">about.txt</div>
     </div>
     <div class="content">
       <p>Hello!</p>
-      <p>My name is Elina Arbo and I am an artist that works with across club, dance, and experimental music. </p>
+      <p>My name is Elina Arbo and I am an artist that works across club, dance, and experimental music.</p>
       <p>I was a 2023 Tanfis II resident at Remix Culture, and my current practice focuses on language loss and regeneration.</p>
-      <p>Send me an email &amp; I'll say hi back. </p>
+      <p>Send me an email &amp; I'll say hi back.</p>
     </div>
   </div>
 
-  <div class="win" id="win-photo">
-    <div class="titlebar">
-      <span class="tl-dot close-btn" style="background:#ff5f57"></span><span class="tl-dot" style="background:#febc2e"></span><span class="tl-dot" style="background:#28c840"></span>
-      <div class="wtitle">Photobooth.jpeg</div>
-    </div>
-    <div class="content">
-      <img class="preview" src="icons/photobooth.png" alt="">
-      <div class="placeholder-note">This preview and the icon both pull from icons/photobooth.png — replace that one file and both update.</div>
-    </div>
-  </div>
-
-  <div class="win" id="win-pdf">
-    <div class="titlebar">
-      <span class="tl-dot close-btn" style="background:#ff5f57"></span><span class="tl-dot" style="background:#febc2e"></span><span class="tl-dot" style="background:#28c840"></span>
-      <div class="wtitle">April.pdf</div>
-    </div>
-    <div class="content">
-      <p>This would open your actual PDF (a flyer, zine, or press one-sheet, for example) in a new tab.</p>
-      <a class="btn" href="#" target="_blank" rel="noopener">Open PDF ↗</a>
-    </div>
-  </div>
-
-  <div class="win" id="win-tour">
-    <div class="titlebar">
-      <span class="tl-dot close-btn" style="background:#ff5f57"></span><span class="tl-dot" style="background:#febc2e"></span><span class="tl-dot" style="background:#28c840"></span>
-      <div class="wtitle">2024 Tour &amp; Tickets</div>
-    </div>
-    <div class="content">
-      <h2>Tour Dates</h2>
-      <ul>
-        <li>Sept 12 — Los Angeles, CA</li>
-        <li>Sept 20 — San Francisco, CA</li>
-        <li>Oct 4 — San Diego, CA</li>
-      </ul>
-      <a class="btn" href="#" target="_blank" rel="noopener">All Tickets ↗</a>
-    </div>
-  </div>
 </div>
 
 <script>
-/* ======================================================================
-   ICON CONFIG — this is the only part you need to touch for new content.
-
-   To SWAP an existing icon's picture:
-     Just replace the PNG/JPEG file in the /icons folder, keeping the
-     same filename. Nothing else needs to change.
-
-   To RESIZE an icon:
-     Change its "width" number (in pixels). Height scales automatically.
-
-   To MOVE an icon's default position:
-     Change "x" and "y" (percent from left / top of the screen).
-     People can still drag it anywhere afterward — this is just the
-     starting spot.
-
-   To ADD a brand new icon:
-     1. Add your image file to the /icons folder, e.g. icons/new-mix.jpg
-     2. Copy one of the blocks below, paste it, and edit the fields.
-     3. Set "action" to either:
-          { type: "window", target: "win-something" }   -> opens a popup
-          { type: "link",   target: "https://..." }      -> opens a URL
-     4. If you used type:"window", also add a matching
-          <div class="win" id="win-something">...</div>
-        block up in the HTML above (copy one of the existing ones).
-
-   To DELETE an icon: just delete or comment out its block.
-   ====================================================================== */
-
   const ICONS = [
     {
-      id: "about.txt",
+      id: "about",
       label: "about.txt",
       image: "icons/about-icon.png",
       width: 96,
       x: 6, y: 16,
-      action: { type: "window", target: "win-flyer" }
+      action: { type: "window", target: "win-about" }
     },
     {
       id: "mixes",
@@ -281,7 +203,7 @@
       image: "icons/mp3-icon.png",
       width: 82,
       x: 75, y: 10,
-      action: { type: "link", target: "https://soundcloud.com/elinaondeck" } // TODO: your real link
+      action: { type: "link", target: "https://soundcloud.com/elinaondeck" }
     },
     {
       id: "photo-booth",
@@ -289,23 +211,15 @@
       image: "icons/photo-booth.png",
       width: 100,
       x: 56, y: 38,
-      action: { type: "window", target: "win-photo" }
+      action: { type: "image" }
     },
     {
-      id: "pdf",
-      label: "April.pdf",
-      image: "icons/pdf.png",
-      width: 74,
-      x: 7, y: 52,
-      action: { type: "window", target: "win-pdf" }
-    },
-    {
-      id: "tour",
-      label: "2024 Tour & Tickets",
-      image: "icons/folder.png",
+      id: "moodring",
+      label: "moodring.pdf",
+      image: "icons/moodring.png",
       width: 100,
       x: 29, y: 57,
-      action: { type: "window", target: "win-tour" }
+      action: { type: "image" }
     },
     {
       id: "email",
@@ -313,20 +227,16 @@
       image: "icons/email-icon.png",
       width: 78,
       x: 85, y: 66,
-      action: { type: "link", target: "mailto:you@example.com" } // TODO: your real email
+      action: { type: "link", target: "mailto:you@example.com" }
     }
   ];
 
-  // Your Instagram link (top right icon)
-  const INSTAGRAM_URL = "https://instagram.com/"; // TODO: your handle
-
-  /* ===================== everything below just runs the page ===================== */
+  const INSTAGRAM_URL = "https://instagram.com/elinaarbo";
 
   const desktop = document.getElementById('desktop');
   const overlay = document.getElementById('overlay');
   document.getElementById('ig-link').href = INSTAGRAM_URL;
 
-  // live clock
   function tick(){
     const d = new Date();
     const h = String(d.getHours()).padStart(2,'0');
@@ -348,6 +258,11 @@
     overlay.classList.add('show');
     bringToFront(w);
   }
+  function openImageViewer(cfg){
+    document.getElementById('image-viewer-img').src = cfg.expandImage || cfg.image;
+    document.getElementById('image-viewer-title').textContent = cfg.label;
+    openWindow('win-image-viewer');
+  }
   function closeAllWindows(){
     document.querySelectorAll('.win.open').forEach(o=>o.classList.remove('open'));
     overlay.classList.remove('show');
@@ -357,7 +272,6 @@
     btn.addEventListener('click', (e)=>{ e.stopPropagation(); closeAllWindows(); });
   });
 
-  // generic draggable — works for icons and window titlebars
   function makeDraggable(handle, moveTarget, opts){
     opts = opts || {};
     let startX, startY, startLeft, startTop, dragging=false, moved=false;
@@ -391,13 +305,11 @@
     });
   }
 
-  // build icons from ICONS config
   ICONS.forEach(cfg=>{
     const el = document.createElement('div');
     el.className = 'icon';
     el.style.left = cfg.x + '%';
     el.style.top = cfg.y + '%';
-    // responsive width: never exceeds a share of the viewport
     el.style.width = 'min(' + cfg.width + 'px, ' + (cfg.width/1100*100).toFixed(1) + 'vw + 40px)';
 
     const thumb = document.createElement('div');
@@ -408,7 +320,6 @@
     img.src = cfg.image;
     img.alt = cfg.label;
     img.onerror = function(){
-      // graceful fallback if an image file is missing/renamed
       thumb.innerHTML = '';
       thumb.style.background = 'rgba(255,255,255,0.85)';
       thumb.style.borderRadius = '10px';
@@ -439,16 +350,15 @@
         if(!moved){
           if(cfg.action.type === 'window') openWindow(cfg.action.target);
           if(cfg.action.type === 'link') window.open(cfg.action.target, '_blank');
+          if(cfg.action.type === 'image') openImageViewer(cfg);
         }
       }
     });
   });
 
-  // window titlebars
   document.querySelectorAll('.win').forEach(win=>{
     const bar = win.querySelector('.titlebar');
     makeDraggable(bar, win, { onStart: ()=> bringToFront(win) });
-    // give each window a sensible default open position, roughly centered-ish
     win.style.left = '20%';
     win.style.top = '18%';
   });
