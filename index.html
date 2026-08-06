@@ -45,7 +45,8 @@
     cursor:grab;
     touch-action:none;
     z-index:2;
-    transition:width 0.15s ease-out, left 0.15s ease-out, top 0.15s ease-out;
+    transition:width 0.2s cubic-bezier(0.4,0,0.2,1), left 0.2s cubic-bezier(0.4,0,0.2,1), top 0.2s cubic-bezier(0.4,0,0.2,1), transform 0.2s cubic-bezier(0.4,0,0.2,1);
+    will-change:transform;
   }
   .icon.dragging{
     transition:none;
