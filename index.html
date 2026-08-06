@@ -45,7 +45,10 @@
     cursor:grab;
     touch-action:none;
     z-index:2;
-    transition:width 0.25s ease, left 0.25s ease, top 0.25s ease;
+    transition:width 0.15s ease-out, left 0.15s ease-out, top 0.15s ease-out;
+  }
+  .icon.dragging{
+    transition:none;
   }
   .icon:active{ cursor:grabbing; }
   .icon.expanded{ cursor:pointer; }
@@ -174,7 +177,7 @@
     },
     {
       id: "mixes",
-      label: "mixes.mp3",
+      label: "Mixes.mp3",
       image: "icons/mp3-icon.png",
       width: 82,
       x: 75, y: 10,
