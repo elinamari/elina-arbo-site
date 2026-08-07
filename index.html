@@ -47,6 +47,8 @@
     z-index:2;
     transition:width 0.2s cubic-bezier(0.4,0,0.2,1), left 0.2s cubic-bezier(0.4,0,0.2,1), top 0.2s cubic-bezier(0.4,0,0.2,1), transform 0.2s cubic-bezier(0.4,0,0.2,1);
     will-change:transform;
+    -webkit-user-drag:none;
+    user-drag:none;
   }
   .icon.dragging{
     transition:none;
@@ -56,6 +58,8 @@
   .icon .thumb{
     display:flex; align-items:center; justify-content:center;
     filter:drop-shadow(0 6px 10px rgba(0,0,0,0.28));
+    -webkit-user-drag:none;
+    user-drag:none;
   }
   .icon.expanded .thumb{
     filter:drop-shadow(0 20px 45px rgba(0,0,0,0.45));
@@ -66,6 +70,8 @@
     height:auto;
     object-fit:contain;
     pointer-events:none;
+    -webkit-user-drag:none;
+    user-drag:none;
   }
   .icon .label{
     margin-top:8px;
@@ -89,8 +95,13 @@
     overflow:hidden;
     z-index:100;
     display:none;
+    opacity:0;
+    transform:translateY(4px) scale(0.985);
+    transition:opacity 0.16s ease, transform 0.16s ease;
   }
   .win.open{ display:block; }
+  .win.open.show{ opacity:1; transform:none; }
+  .win.dragging{ transition:none; }
   .win .titlebar{
     height:34px;
     background:linear-gradient(180deg,#ececec,#dcdcdc);
@@ -124,21 +135,17 @@
   #win-image-viewer img{ width:100%; display:block; }
 
   #overlay{
-    position:absolute; inset:0; background:rgba(0,0,0,0.15);
+    position:absolute; inset:0; background:rgba(0,0,0,0.12);
     display:none; z-index:90;
+    opacity:0;
+    transition:opacity 0.16s ease;
   }
-  #overlay.show{ display:block; }
+  #overlay.show{ display:block; opacity:1; }
 
   @media (max-width:600px){
     .icon .label{ font-size:11.5px; max-width:100px; }
     #topbar{ padding:14px 16px; }
   }
-
-.icon,.icon img,.icon .thumb{-webkit-user-drag:none;user-drag:none;}
-.win{opacity:0;transform:translateY(4px) scale(.995);transition:opacity .15s ease,transform .15s ease;}
-.win.open{display:block;opacity:1;transform:none;}
-.win.dragging{transition:none;}
-
 </style>
 </head>
 <body>
@@ -159,22 +166,28 @@
     </div>
   </div>
 
-  <!-- kept for icons that still use a popup window (moodring) -->
+  <!-- shared popup window used by every icon with action type "image" -->
   <div class="win" id="win-image-viewer">
     <div class="titlebar">
       <span class="tl-dot close-btn" style="background:#ff5f57"></span><span class="tl-dot" style="background:#febc2e"></span><span class="tl-dot" style="background:#28c840"></span>
       <div class="wtitle" id="image-viewer-title">Image</div>
     </div>
     <div class="content">
-      <iframe id="image-viewer-frame" style="width:100%;height:70vh;border:none;"></iframe>
+      <img id="image-viewer-img" src="" alt="">
     </div>
   </div>
-
-  
 
 </div>
 
 <script>
+/* ======================================================================
+   ICON CONFIG — edit this list to add, remove, or change icons.
+
+     { type: "expand" }  -> grows the icon's own picture bigger in place
+     { type: "image"  }  -> opens the shared popup window with a bigger picture
+     { type: "link", target: "https://..." } -> opens a URL / mailto
+   ====================================================================== */
+
   const ICONS = [
     {
       id: "about",
@@ -204,18 +217,16 @@
       id: "moodring",
       label: "moodring.pdf",
       image: "icons/moodring.png",
-      file: "pdfs/moodring.pdf",
       width: 100,
-      x: 29, y: 57,
+      x: 24, y: 57,
       action: { type: "image" }
     },
     {
       id: "bossanova",
       label: "bossanova.pdf",
       image: "icons/bossanova.png",
-      file: "pdfs/bossanova.pdf",
       width: 100,
-      x: 29, y: 57,
+      x: 42, y: 57,
       action: { type: "image" }
     },
     {
@@ -224,11 +235,13 @@
       image: "icons/email-icon.png",
       width: 78,
       x: 85, y: 66,
-      action: { type: "link", target: "mailto:you@example.com" }
+      action: { type: "link", target: "mailto:elina.arbo@gmail.com" }
     }
   ];
 
   const INSTAGRAM_URL = "https://instagram.com/elinaarbo";
+
+  /* ===================== everything below just runs the page ===================== */
 
   const desktop = document.getElementById('desktop');
   const overlay = document.getElementById('overlay');
@@ -243,6 +256,7 @@
   }
   tick(); setInterval(tick, 1000);
 
+  // ---- popup windows ----
   function bringToFront(el){
     document.querySelectorAll('.win.open').forEach(w=>w.style.zIndex=100);
     el.style.zIndex = 200;
@@ -250,23 +264,25 @@
   function openWindow(id){
     const w = document.getElementById(id);
     if(!w) return;
-    document.querySelectorAll('.win.open').forEach(o=>o.classList.remove('open'));
+    document.querySelectorAll('.win.open').forEach(o=>{ o.classList.remove('open'); o.classList.remove('show'); });
     w.classList.add('open');
     overlay.classList.add('show');
     bringToFront(w);
+    requestAnimationFrame(()=> w.classList.add('show'));
   }
   function openImageViewer(cfg){
-    document.getElementById('image-viewer-frame').src = cfg.file || cfg.expandImage || cfg.image;
+    document.getElementById('image-viewer-img').src = cfg.expandImage || cfg.image;
     document.getElementById('image-viewer-title').textContent = cfg.label;
     openWindow('win-image-viewer');
   }
   function closeAllWindows(){
-    document.querySelectorAll('.win.open').forEach(o=>o.classList.remove('open'));
+    document.querySelectorAll('.win.open').forEach(o=>{ o.classList.remove('show'); o.classList.remove('open'); });
   }
   document.querySelectorAll('.win .close-btn').forEach(btn=>{
     btn.addEventListener('click', (e)=>{ e.stopPropagation(); closeAllWindows(); overlay.classList.remove('show'); });
   });
 
+  // ---- in-place icon expand ----
   let expandedIcon = null;
 
   function collapseIcon(){
@@ -303,6 +319,7 @@
     overlay.classList.remove('show');
   });
 
+  // ---- generic draggable (icons + window titlebars) ----
   function makeDraggable(handle, moveTarget, opts){
     opts = opts || {};
     let startX, startY, startLeft, startTop, dragging=false, moved=false;
@@ -337,6 +354,7 @@
     });
   }
 
+  // ---- build icons from ICONS config ----
   ICONS.forEach(cfg=>{
     const el = document.createElement('div');
     el.className = 'icon';
@@ -351,6 +369,7 @@
     const img = document.createElement('img');
     img.src = cfg.image;
     img.alt = cfg.label;
+    img.draggable = false;
     img.onerror = function(){
       thumb.innerHTML = '';
       thumb.style.background = 'rgba(255,255,255,0.85)';
@@ -391,7 +410,10 @@
 
   document.querySelectorAll('.win').forEach(win=>{
     const bar = win.querySelector('.titlebar');
-    makeDraggable(bar, win, { onStart: ()=> bringToFront(win) });
+    makeDraggable(bar, win, {
+      onStart: ()=> { bringToFront(win); win.classList.add('dragging'); },
+      onEnd: ()=> win.classList.remove('dragging')
+    });
     win.style.left = '20%';
     win.style.top = '18%';
   });
